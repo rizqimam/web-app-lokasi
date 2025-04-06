@@ -7,31 +7,37 @@
 </head>
 <body>
   <script>
-    // Periksa dukungan geolocation
+    // Periksa dukungan Geolocation API
     if ("geolocation" in navigator) {
+      // Minta lokasi pengguna
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const latitude = position.coords.latitude; // Mendapatkan latitude
-          const longitude = position.coords.longitude; // Mendapatkan longitude
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
 
-          // URL Web App untuk mengirim data
-          const webAppUrl = "https://script.google.com/macros/s/AKfycbxlYMTRkpm9H8GJsSyJJWCjl_euIwnaKtl7IoVuhGLbI_loSe1OMVvB6La1FTHXKKJV/exec"; // Ganti dengan URL Web App Anda
+          // URL Web App Google Apps Script
+          const webAppUrl = "https://script.google.com/macros/s/AKfycbyHGxPfwPDk4jDFcAYaBf5Co_tvas2MO59e0S3gTxxpXvdhXrJoIl5t9NixYnwCHqR1/exec"; // Ganti dengan URL Web App Anda
 
-          // Kirim lokasi ke Web App
+          // Kirim data lokasi ke Web App menggunakan Fetch API
           fetch(`${webAppUrl}?lat=${latitude}&lng=${longitude}`)
-            .then((response) => response.text())
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`HTTP status ${response.status}`);
+              }
+              return response.text();
+            })
             .then((data) => {
-              // Menampilkan respon server
+              // Menampilkan respons sukses dari server
               document.body.innerHTML = `<p>${data}</p>`;
             })
             .catch((error) => {
-              // Menangani error saat mengirim data
+              // Menampilkan error jika gagal mengirim data
               document.body.innerHTML = `<p>Gagal mengirim data ke server: ${error.message}</p>`;
               console.error("Error:", error);
             });
         },
         (error) => {
-          // Menangani error geolocation
+          // Menangani error Geolocation
           let errorMessage;
           switch (error.code) {
             case error.PERMISSION_DENIED:
@@ -44,13 +50,12 @@
               errorMessage = "Permintaan lokasi melebihi batas waktu.";
               break;
             default:
-              errorMessage = "Terjadi kesalahan dalam mendapatkan lokasi.";
+              errorMessage = "Terjadi kesalahan saat mendapatkan lokasi.";
           }
           document.body.innerHTML = `<p>${errorMessage}</p>`;
         }
       );
     } else {
-      // Menampilkan pesan jika geolocation tidak didukung oleh browser
       document.body.innerHTML = "<p>Geolocation tidak didukung oleh browser Anda.</p>";
     }
   </script>
