@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web App Lokasi</title>
+</head>
+<body>
+  <script>
+    // Periksa dukungan geolocation
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude; // Mendapatkan latitude
+          const longitude = position.coords.longitude; // Mendapatkan longitude
+
+          // URL Web App untuk mengirim data
+          const webAppUrl = "https://script.google.com/macros/s/AKfycbxlYMTRkpm9H8GJsSyJJWCjl_euIwnaKtl7IoVuhGLbI_loSe1OMVvB6La1FTHXKKJV/exec"; // Ganti dengan URL Web App Anda
+
+          // Kirim lokasi ke Web App
+          fetch(`${webAppUrl}?lat=${latitude}&lng=${longitude}`)
+            .then((response) => response.text())
+            .then((data) => {
+              // Menampilkan respon server
+              document.body.innerHTML = `<p>${data}</p>`;
+            })
+            .catch((error) => {
+              // Menangani error saat mengirim data
+              document.body.innerHTML = `<p>Gagal mengirim data ke server: ${error.message}</p>`;
+              console.error("Error:", error);
+            });
+        },
+        (error) => {
+          // Menangani error geolocation
+          let errorMessage;
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Izin lokasi ditolak oleh pengguna.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Informasi lokasi tidak tersedia.";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "Permintaan lokasi melebihi batas waktu.";
+              break;
+            default:
+              errorMessage = "Terjadi kesalahan dalam mendapatkan lokasi.";
+          }
+          document.body.innerHTML = `<p>${errorMessage}</p>`;
+        }
+      );
+    } else {
+      // Menampilkan pesan jika geolocation tidak didukung oleh browser
+      document.body.innerHTML = "<p>Geolocation tidak didukung oleh browser Anda.</p>";
+    }
+  </script>
+</body>
+</html>
